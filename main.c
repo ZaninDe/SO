@@ -69,7 +69,7 @@ void read_line(char line[])
 
   remove_end_of_line(line);
 
-  if( strcmp(line, "exit") == 0|| ret == NULL) // terminar execucao do shell
+  if(ret == NULL) // terminar execucao do shell
   exit(0);
 }
 
@@ -85,6 +85,23 @@ int process_line(char *temp[], char line[]) // processa a linha de entrada
   }
 
   return 1;
+}
+
+int sequence_operator_checking(char* temp [], char line[]) {
+  int i = 0;
+  int j;
+  temp[i] = strtok(line, ";"); // quebra a string por ";" em tokens
+
+  while (temp[i] != NULL)
+  {
+    i++;
+    temp[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
+  }
+
+  for(j=0; j<i+1; j++)
+    printf("-> %s ", temp[j]);
+
+  return i;
 }
 
 int pipe_and_redirection_checking(char* temp[]) { // verifica <, > e |
@@ -159,7 +176,6 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
 
   process_line(temp, line);
 
-
   check_line(temp);
   pos = pipe_and_redirection_checking(temp);
 
@@ -207,18 +223,22 @@ int main()
   char *args[MAX_WORD];
   char line[MAX_CHAR];
   char* piping_args[MAX_WORD];
+  int i;
 
 
   int pipefd [2]; // processo a esquerda e a direita do pipe
   pipe(pipefd); // chama a function pipe com o array de pipe
 
-    printDir();
+    printDir(); 
 
 
   while (read_parse_line(args, line, piping_args))
   {
+    builtin(args); // chama a função para executar comandos builtin caso exista
+
+
     printDir();
-    builtin(args);
+    
     pid_t pid = fork();
 
     if (pid == 0) // processo filho: executa o comando
