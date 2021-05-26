@@ -87,19 +87,17 @@ int process_line(char *temp[], char line[]) // processa a linha de entrada
   return 1;
 }
 
-int sequence_operator_checking(char* temp [], char line[]) {
+int sequence_operator_checking(char* args[], char line[]) {
   int i = 0;
   int j;
-  temp[i] = strtok(line, ";"); // quebra a string por ";" em tokens
+  args[i] = strtok(line, ";"); // quebra a string por ";" em tokens
+  i++;
 
-  while (temp[i] != NULL)
+  while (args[i] != NULL)
   {
+    args[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
     i++;
-    temp[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
   }
-
-  for(j=0; j<i+1; j++)
-    printf("-> %s ", temp[j]);
 
   return i;
 }
@@ -171,8 +169,11 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
   char* temp[MAX_WORD];
   int pos;
   int i = 0;
+  int j = 0;
 
   read_line(line);
+
+  int count = sequence_operator_checking(temp, line);
 
   process_line(temp, line);
 
@@ -195,7 +196,6 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
       j++;
     }
   }
-
   return 1;
 }
 
@@ -224,16 +224,19 @@ int main()
   char line[MAX_CHAR];
   char* piping_args[MAX_WORD];
   int i;
+  int k = 1;
 
 
   int pipefd [2]; // processo a esquerda e a direita do pipe
   pipe(pipefd); // chama a function pipe com o array de pipe
 
-    printDir(); 
-
+    printDir();
+  
 
   while (read_parse_line(args, line, piping_args))
   {
+
+  
     builtin(args); // chama a função para executar comandos builtin caso exista
 
 
