@@ -22,6 +22,37 @@ void printDir() {
   printf("\n%s > ", cwd);
 }
 
+int builtin(char* args[]) {
+  int size = 2, argumentosIdentificador = 0;
+  char* comandosEspecificos[size];
+
+  comandosEspecificos[0] = "exit";
+  comandosEspecificos[1] = "cd";
+
+  for(int i = 0; i< size; i++) {
+    if(strcmp(args[0], comandosEspecificos[i]) == 0) {
+      argumentosIdentificador = i+1;
+      break;
+    }
+  }
+
+  switch (argumentosIdentificador)
+  {
+  case 1:
+    exit(0);
+    break;
+  
+  case 2:
+    chdir(args[1]);
+    break;
+
+  default:
+    break;
+  }
+
+  return 0;
+}
+
 void remove_end_of_line(char line[]) // troca o \n da string por \0
 { 
   int i = 0;
@@ -83,7 +114,7 @@ int pipe_and_redirection_checking(char* temp[]) { // verifica <, > e |
   return i;
 }
 
-void check_line(char* temp[]) { // conta a quantidade de pipes ou redirections
+int check_line(char* temp[]) { // conta a quantidade de pipes ou redirections
   int i = 0;
   int pipe_cnt = 0;
   int output_redirection_cnt = 0;
@@ -183,9 +214,11 @@ int main()
 
     printDir();
 
+
   while (read_parse_line(args, line, piping_args))
   {
     printDir();
+    builtin(args);
     pid_t pid = fork();
 
     if (pid == 0) // processo filho: executa o comando
