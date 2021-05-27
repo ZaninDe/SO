@@ -87,19 +87,19 @@ int process_line(char *temp[], char line[]) // processa a linha de entrada
   return 1;
 }
 
-int sequence_operator_checking(char* args[], char line[]) {
+char* sequence_operator_checking(char* aux[], char line[]) {
   int i = 0;
   int j;
-  args[i] = strtok(line, ";"); // quebra a string por ";" em tokens
+  aux[i] = strtok(line, ";"); // quebra a string por ";" em tokens
   i++;
 
-  while (args[i] != NULL)
+  while (aux[i] != NULL)
   {
-    args[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
+    aux[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
     i++;
   }
 
-  return i;
+  return aux;
 }
 
 int pipe_and_redirection_checking(char* temp[]) { // verifica <, > e |
@@ -170,10 +170,13 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
   int pos;
   int i = 0;
   int j = 0;
+	char* sequence;
 
   read_line(line);
-
-  int count = sequence_operator_checking(temp, line);
+	char* teste[MAX_CHAR];
+	sequence_operator_checking(teste, line);
+	printf("!%s!", teste[1]);
+////////////////////////////////// PAREI AQUI, PRECISA JOGAR PRA FORA O TESTE[] EM UM LACO NA MAIN
 
   process_line(temp, line);
 
