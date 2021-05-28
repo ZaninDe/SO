@@ -63,7 +63,7 @@ void remove_end_of_line(char line[]) // troca o \n da string por \0
   line[i] = '\0';
 }
 
-void read_line(char line[])
+int read_line(char line[])
 { // leitura da entrada
   char* ret = fgets(line, MAX_CHAR, stdin); // conteudo da linha
 
@@ -71,6 +71,8 @@ void read_line(char line[])
 
   if(ret == NULL) // terminar execucao do shell
   exit(0);
+
+  return 1;
 }
 
 int process_line(char *temp[], char line[]) // processa a linha de entrada
@@ -172,10 +174,7 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
   int j = 0;
 	char* sequence;
 
-  read_line(line);
-	char* teste[MAX_CHAR];
-	sequence_operator_checking(teste, line);
-	printf("!%s!", teste[1]);
+ 
 ////////////////////////////////// PAREI AQUI, PRECISA JOGAR PRA FORA O TESTE[] EM UM LACO NA MAIN
 
   process_line(temp, line);
@@ -234,12 +233,23 @@ int main()
   pipe(pipefd); // chama a function pipe com o array de pipe
 
     printDir();
+
+  
+	
   
 
-  while (read_parse_line(args, line, piping_args))
+  while (read_line(line))
   {
+    
+    char* teste[MAX_CHAR];
+	  sequence_operator_checking(teste, line);
+    
 
-  
+    int j;
+
+    for(j = 0; j < 2; j++) {
+    read_parse_line(args, teste[j], piping_args);
+
     builtin(args); // chama a função para executar comandos builtin caso exista
 
 
@@ -274,6 +284,7 @@ int main()
       perror("fork()");
       return -1;
     }
+  }
   }
   return 0;
 }
