@@ -89,19 +89,17 @@ int process_line(char *temp[], char line[]) // processa a linha de entrada
   return 1;
 }
 
-char* sequence_operator_checking(char* aux[], char line[]) {
+int sequence_operator_checking(char* aux[], char line[]) { // separa e retorna quantos comandos existem separados por ;
   int i = 0;
-  int j;
   aux[i] = strtok(line, ";"); // quebra a string por ";" em tokens
-  i++;
 
   while (aux[i] != NULL)
   {
-    aux[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
     i++;
+    aux[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
   }
 
-  return aux;
+  return i;
 }
 
 int pipe_and_redirection_checking(char* temp[]) { // verifica <, > e |
@@ -174,8 +172,6 @@ int read_parse_line(char *args[], char line[], char* piping_args[]) // faz o par
   int j = 0;
 	char* sequence;
 
- 
-////////////////////////////////// PAREI AQUI, PRECISA JOGAR PRA FORA O TESTE[] EM UM LACO NA MAIN
 
   process_line(temp, line);
 
@@ -232,23 +228,20 @@ int main()
   int pipefd [2]; // processo a esquerda e a direita do pipe
   pipe(pipefd); // chama a function pipe com o array de pipe
 
-    printDir();
+  printDir();
 
-  
-	
-  
 
   while (read_line(line))
   {
     
     char* teste[MAX_CHAR];
-	  sequence_operator_checking(teste, line);
-    
+	  int k = sequence_operator_checking(teste, line); // separa e retorna quantos comandos tem separados por ;
+  
 
     int j;
 
-    for(j = 0; j < 2; j++) {
-    read_parse_line(args, teste[j], piping_args);
+    for(j = 0; j < k; j++) { // para cada token de k
+    read_parse_line(args, teste[j], piping_args); // faz o parse do token
 
     builtin(args); // chama a função para executar comandos builtin caso exista
 
