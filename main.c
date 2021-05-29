@@ -11,6 +11,7 @@
 #define DEL " "
 
 int input_redirection_flag = 0; // flag de redirecionador
+int is_background = 0; // flag de comando em background
 int output_redirection_flag = 0; // flag de redirecionador
 int piping_flag = 0; // flag de pipe
 char* input_file = NULL;
@@ -98,7 +99,6 @@ int sequence_operator_checking(char* aux[], char line[]) { // separa e retorna q
     i++;
     aux[i] = strtok(NULL, ";"); //  vai para o prox conteúdo da string após ";"
   }
-
   return i;
 }
 
@@ -241,6 +241,12 @@ int main()
     int j;
 
     for(j = 0; j < k; j++) { // para cada token de k
+
+     if(teste[j][strlen(teste[j])-1] == '&') { // procura o comando & na linha para processo em bg
+        teste[j][strlen(teste[j])-1] = '\0';
+        is_background = 1; // sinaliza que sera executado em bg
+     }
+
     read_parse_line(args, teste[j], piping_args); // faz o parse do token
 
     builtin(args); // chama a função para executar comandos builtin caso exista
@@ -266,9 +272,16 @@ int main()
     }
     else if(pid > 0) // processo pai: aguarda o termino do filho
     {
-      waitpid(pid, 0);
+
+        if(is_background == 0) { // só aguarda o termino do processo filho se não houver comando em bg
+            int status;
+            waitpid(pid, &status, 0);
+        }
+       
+
       input_redirection_flag = 0;
       output_redirection_flag = 0;
+      is_background=0;
       piping_flag = 0;
       input_file = NULL;
       output_file = NULL;
